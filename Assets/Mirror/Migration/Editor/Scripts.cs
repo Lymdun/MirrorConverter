@@ -17,7 +17,9 @@ namespace Mirror.MigrationUtilities {
                 @"\[Command([^\],]*)\]",    // Commands over non-reliable channels
                 @"\[ClientRpc([^\],]*)\]",  // ClientRPCs over non-reliable channels
                 @"\[TargetRpc([^\],]*)\]",  // TargetRPCs over non-reliable channels
-                @"\[SyncEvent([^\],]*)\]"   // SyncEvents (over non-reliable channels) - seriously?
+                @"\[SyncEvent([^\],]*)\]",   // SyncEvents (over non-reliable channels) - seriously?
+                "NetworkHash128",
+                "NetworkInstanceId"
             };
 
         public static string[] knownCompatibleReplacements = {
@@ -25,7 +27,9 @@ namespace Mirror.MigrationUtilities {
                 "[Command]",
                 "[ClientRpc]",
                 "[TargetRpc]",
-                "[SyncEvent]"
+                "[SyncEvent]",
+                "System.Guid",
+                "uint"
             };
 
         static int filesModified = 0;
