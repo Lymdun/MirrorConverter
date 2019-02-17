@@ -11,7 +11,7 @@ namespace Mirror.MigrationUtilities {
         // private variables that don't need to be modified.
         static string scriptExtension = "*.cs";
 
-        static string[] knownIncompatibleRegexes = {
+        public static string[] knownIncompatibleRegexes = {
                 "SyncListStruct",   // this probably needs improvement but i didn't want to duplicate lines of code
                 @"\[Command([^\],]*)\]",    // Commands over non-reliable channels
                 @"\[ClientRpc([^\],]*)\]",  // ClientRPCs over non-reliable channels
@@ -19,7 +19,7 @@ namespace Mirror.MigrationUtilities {
                 @"\[SyncEvent([^\],]*)\]"   // SyncEvents (over non-reliable channels) - seriously?
             };
 
-        static string[] knownCompatibleReplacements = {
+        public static string[] knownCompatibleReplacements = {
                 "SyncListSTRUCT",   // because mirror's version is moar bettah.
                 "[Command]",
                 "[ClientRpc]",
@@ -33,34 +33,13 @@ namespace Mirror.MigrationUtilities {
 
         // Logic portion begins below.
 
-        [MenuItem("Tools/Mirror/Migrate scripts from UNET")]
-        public static void Mirror_Migration_Tool() {
+        public static void MigrationTool_DoActualMigration() {
             // Safeguard in case a developer goofs up
             if (knownIncompatibleRegexes.Length != knownCompatibleReplacements.Length) {
-                Debug.Log("[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.");
+                Debug.LogWarning("[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.");
                 return;
             }
 
-            // Display a welcome dialog.
-            if (EditorUtility.DisplayDialog("Mirror Network Migration Tool", "Welcome to the Migration Tool for Mirror Networking. " +
-                "This tool will convert your existing UNET code into the Mirror equivalent code.\n\nBefore we begin, we STRONGLY " +
-                "recommend you take a full backup of your project as this tool is not perfect.\n\nWhile it does not attempt to " +
-                "purposefully trash your network scripts, it could break your project. Be smart and BACKUP NOW.",
-                "I'm good.", "I'll backup first.")) {
-
-                // User accepted the risks - go ahead!
-                MigrationTool_DoActualMigration();
-                // Cleanup after yourself.
-                MigrationTool_Cleanup();
-                // Refresh the asset database, because sometimes Unity will be lazy about it.
-                AssetDatabase.Refresh();
-            } else {
-                EditorUtility.DisplayDialog("Aborted", "You opted to abort the migration process. Please come back once you've taken a backup.", "Got it");
-                return;
-            }
-        }
-
-        private static void MigrationTool_DoActualMigration() {
             // Place holder for the assets folder location.
             string assetsFolder = Application.dataPath;
             // List structure for the CSharp files.
@@ -192,7 +171,7 @@ namespace Mirror.MigrationUtilities {
         /// <summary>
         /// Cleans up after the migration tool is completed or has failed.
         /// </summary>
-        private static void MigrationTool_Cleanup() {
+        public static void MigrationTool_Cleanup() {
             scriptBuffer = string.Empty;
             matches = null;
             filesModified = 0;
