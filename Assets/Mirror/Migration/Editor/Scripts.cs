@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -52,10 +53,11 @@ namespace Mirror.MigrationUtilities {
             // Now we scan the directory...
             try {
                 DirectoryInfo dirInfo = new DirectoryInfo(assetsFolder);
+                IEnumerable<FileInfo> potentialFiles = dirInfo.GetFiles(scriptExtension, SearchOption.AllDirectories).Where(x => !x.DirectoryName.Contains(@"\Mirror\"));
 
                 // For every entry in this structure add it to the list.
                 // SearchOption.AllDirectories will traverse the directory stack
-                foreach (FileInfo potentialFile in dirInfo.GetFiles(scriptExtension, SearchOption.AllDirectories)) {
+                foreach (FileInfo potentialFile in potentialFiles) {
                     // DEBUG ONLY. This will cause massive Unity Console Spammage!
                     // Debug.Log("[Mirror Migration Tool] DEBUG: Scanned " + potentialFile.FullName);
                     filesToScanAndModify.Add(potentialFile.FullName);
