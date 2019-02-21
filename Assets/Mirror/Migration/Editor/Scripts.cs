@@ -19,7 +19,8 @@ namespace Mirror.MigrationUtilities {
                 @"\[TargetRpc([^\],]*)\]",  // TargetRPCs over non-reliable channels
                 @"\[SyncEvent([^\],]*)\]",   // SyncEvents (over non-reliable channels) - seriously?
                 "NetworkHash128",
-                "NetworkInstanceId"
+                "NetworkInstanceId",
+                "GetNetworkSendInterval()"
             };
 
         public static string[] knownCompatibleReplacements = {
@@ -29,7 +30,8 @@ namespace Mirror.MigrationUtilities {
                 "[TargetRpc]",
                 "[SyncEvent]",
                 "System.Guid",
-                "uint"
+                "uint",
+                "syncInterval"
             };
 
         static int filesModified = 0;
