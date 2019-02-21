@@ -50,10 +50,10 @@ public class Windows : EditorWindow {
             "Yes, farewell UNET!", "Cancel")) {
 
             // User accepted the risks - go ahead!
-            Scripts.MigrationTool_DoActualMigration();
+            Scripts.ScriptsMigration();
 
             // Cleanup after yourself.
-            Scripts.MigrationTool_Cleanup();
+            Scripts.Cleanup();
 
             // Refresh the asset database, because sometimes Unity will be lazy about it.
             AssetDatabase.Refresh();

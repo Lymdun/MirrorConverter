@@ -38,7 +38,7 @@ namespace Mirror.MigrationUtilities {
 
         // Logic portion begins below.
 
-        public static void MigrationTool_DoActualMigration() {
+        public static void ScriptsMigration() {
             // Safeguard in case a developer goofs up
             if (knownIncompatibleRegexes.Length != knownCompatibleReplacements.Length) {
                 Debug.LogWarning("[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.");
@@ -75,7 +75,7 @@ namespace Mirror.MigrationUtilities {
                 }
 
                 // Okay, let's do this!
-                MigrationTool_FileProcessor(filesToScanAndModify);
+                ProcessFiles(filesToScanAndModify);
 
                 Debug.Log("[Mirror Migration Tool] Processed (and patched, if required) " + filesModified + " files");
 
@@ -87,12 +87,12 @@ namespace Mirror.MigrationUtilities {
             } catch (System.Exception ex) {
                 EditorUtility.DisplayDialog("Oh no!", "An exception occurred. If you think this is a Mirror Networking bug, please file a bug report on the GitHub repository." +
                     "It could also be a logic bug in the Migration Tool itself. I encountered the following exception:\n\n" + ex.ToString(), "Okay");
-                MigrationTool_Cleanup();
+                Cleanup();
                 return;
             }
         }
 
-        private static void MigrationTool_FileProcessor(List<string> filesToProcess) {
+        private static void ProcessFiles(List<string> filesToProcess) {
             StreamReader sr;
             StreamWriter sw;
 
@@ -182,7 +182,7 @@ namespace Mirror.MigrationUtilities {
         /// <summary>
         /// Cleans up after the migration tool is completed or has failed.
         /// </summary>
-        public static void MigrationTool_Cleanup() {
+        public static void Cleanup() {
             scriptBuffer = string.Empty;
             matches = null;
             filesModified = 0;
