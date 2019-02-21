@@ -41,7 +41,7 @@ namespace Mirror.MigrationUtilities {
         public static void ScriptsMigration() {
             // Safeguard in case a developer goofs up
             if (knownIncompatibleRegexes.Length != knownCompatibleReplacements.Length) {
-                Debug.LogWarning("[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.");
+                Debug.LogError("[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.\nPlease re-download the converter.");
                 return;
             }
 
