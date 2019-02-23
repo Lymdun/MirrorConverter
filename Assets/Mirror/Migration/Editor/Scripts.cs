@@ -106,7 +106,7 @@ namespace Mirror.MigrationUtilities {
                         sr.Close();
                     }
 
-                    if (scriptBuffer.Contains("UnityWebRequest")) {
+                    if (scriptBuffer.Contains("UnityWebRequest") && !scriptBuffer.Contains("using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;")) {
                         int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
                         scriptBuffer = scriptBuffer.Insert(correctIndex, "using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;" + System.Environment.NewLine);
                     }
