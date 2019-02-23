@@ -10,9 +10,9 @@ namespace Mirror.MigrationUtilities {
     public class Scripts : MonoBehaviour {
 
         // private variables that don't need to be modified.
-        static string scriptExtension = "*.cs";
+        static readonly string scriptExtension = "*.cs";
 
-        public static string[] knownIncompatibleRegexes = {
+        public static readonly string[] knownIncompatibleRegexes = {
                 "SyncListStruct",   // this probably needs improvement but i didn't want to duplicate lines of code
                 @"\[Command([^\],]*)\]",    // Commands over non-reliable channels
                 @"\[ClientRpc([^\],]*)\]",  // ClientRPCs over non-reliable channels
@@ -23,7 +23,7 @@ namespace Mirror.MigrationUtilities {
                 "GetNetworkSendInterval()"
             };
 
-        public static string[] knownCompatibleReplacements = {
+        public static readonly string[] knownCompatibleReplacements = {
                 "SyncListSTRUCT",   // because mirror's version is moar bettah.
                 "[Command]",
                 "[ClientRpc]",
