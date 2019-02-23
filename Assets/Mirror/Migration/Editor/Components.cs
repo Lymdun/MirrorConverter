@@ -33,34 +33,40 @@ namespace Mirror.MigrationUtilities {
             string[] files = Directory.GetFiles(Application.dataPath, "*.prefab", SearchOption.AllDirectories);
             int gameObjectCount = files.Length;
 
-            foreach (string file in files) {
-                fileCounter++;
-                EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} files scanned...", fileCounter, gameObjectCount), fileCounter / gameObjectCount);
+            try {
+                foreach (string file in files) {
+                    fileCounter++;
+                    EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} files scanned...", fileCounter, gameObjectCount), fileCounter / gameObjectCount);
 
-                string relativepath = "Assets" + file.Substring(Application.dataPath.Length);
-                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(relativepath);
+                    string relativepath = "Assets" + file.Substring(Application.dataPath.Length);
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(relativepath);
 
-                IEnumerable<Transform> childsAndParent = prefab.GetComponentsInChildren<Transform>(true);
+                    IEnumerable<Transform> childsAndParent = prefab.GetComponentsInChildren<Transform>(true);
 
-                foreach (Transform actualChild in childsAndParent) {
-                    // replace UNET components with their mirror counterpart
-                    netComponentCount += ReplaceEveryNetworkComponent(actualChild.gameObject);
+                    foreach (Transform actualChild in childsAndParent) {
+                        // replace UNET components with their mirror counterpart
+                        netComponentCount += ReplaceEveryNetworkComponent(actualChild.gameObject);
 
-                    // always replace NetworkIdentity as last element, due to dependencies
-                    netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
+                        // always replace NetworkIdentity as last element, due to dependencies
+                        netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
 
-                    // check for obsolete components
-                    int compObsolete = 0;
-                    logErrors += CheckObsoleteComponents(actualChild.gameObject, out compObsolete);
-                    netComponentObsolete += compObsolete;
+                        // check for obsolete components
+                        int compObsolete = 0;
+                        logErrors += CheckObsoleteComponents(actualChild.gameObject, out compObsolete);
+                        netComponentObsolete += compObsolete;
+                    }
                 }
+
+                Debug.LogFormat("Searched {0} Prefabs, found {1} UNET NetworkIdentity, {2} Components and replaced them with Mirror components.\nAlso found {3} now deprecated components.", gameObjectCount, netIdComponentsCount, netComponentCount, netComponentObsolete);
+
+                if (netComponentObsolete > 0)
+                    Debug.LogWarningFormat("List of now deprecated components found on your project:\n{0}", logErrors);
+            } catch (System.Exception e) {
+                Debug.LogError("[Mirror Migration Tool] Encountered an exception!");
+                Debug.LogException(e);
+            } finally {
+                EditorUtility.ClearProgressBar();
             }
-
-            EditorUtility.ClearProgressBar();
-            Debug.LogFormat("Searched {0} Prefabs, found {1} UNET NetworkIdentity, {2} Components and replaced them with Mirror components.\nAlso found {3} now deprecated components.", gameObjectCount, netIdComponentsCount, netComponentCount, netComponentObsolete);
-
-            if (netComponentObsolete > 0)
-                Debug.LogWarningFormat("List of now deprecated components found on your project:\n{0}", logErrors);
         }
 
         public static void FindAndReplaceUnetSceneGameObject(out int netComponentObsolete) {
