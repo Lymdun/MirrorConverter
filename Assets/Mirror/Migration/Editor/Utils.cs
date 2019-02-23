@@ -45,30 +45,28 @@ namespace Mirror.MigrationUtilities {
             // populate them from their desination counterparts  
             PropertyInfo[] srcProps = typeSrc.GetProperties();
             foreach (PropertyInfo srcProp in srcProps) {
-                if (!srcProp.CanRead) {
+                if (!srcProp.CanRead)
                     continue;
-                }
 
                 PropertyInfo targetProperty = typeDest.GetProperty(srcProp.Name,
                     BindingFlags.DeclaredOnly |
                     BindingFlags.Public |
                     BindingFlags.Instance);
 
-                if (targetProperty == null) {
+                if (targetProperty == null)
                     continue;
-                }
-                if (!targetProperty.CanWrite) {
+                
+                if (!targetProperty.CanWrite) 
                     continue;
-                }
-                if (targetProperty.GetSetMethod(true) != null && targetProperty.GetSetMethod(true).IsPrivate) {
+                
+                if (targetProperty.GetSetMethod(true) != null && targetProperty.GetSetMethod(true).IsPrivate) 
                     continue;
-                }
-                if ((targetProperty.GetSetMethod().Attributes & MethodAttributes.Static) != 0) {
+                
+                if ((targetProperty.GetSetMethod().Attributes & MethodAttributes.Static) != 0) 
                     continue;
-                }
-                if (!targetProperty.PropertyType.IsAssignableFrom(srcProp.PropertyType)) {
+                
+                if (!targetProperty.PropertyType.IsAssignableFrom(srcProp.PropertyType)) 
                     continue;
-                }
 
                 // Passed all tests, lets set the value
                 targetProperty.SetValue(destination, srcProp.GetValue(source, null), null);
