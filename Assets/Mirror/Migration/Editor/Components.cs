@@ -40,25 +40,44 @@ namespace Mirror.MigrationUtilities {
             try {
                 foreach (string file in files) {
                     fileCounter++;
+                    int numChangesOnFile = 0;
+                    string relativepath = "Assets" + file.Substring(Application.dataPath.Length);
+
                     EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} files scanned...", fileCounter, gameObjectCount), fileCounter / gameObjectCount);
 
-                    string relativepath = "Assets" + file.Substring(Application.dataPath.Length);
-                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(relativepath);
+                    GameObject prefab;
+                    try {
+                        prefab = PrefabUtility.LoadPrefabContents(relativepath);
+                    } catch (System.Exception) {
+                        continue;
+                    }
+
+                    if (prefab == null)
+                        continue;
 
                     IEnumerable<Transform> childsAndParent = prefab.GetComponentsInChildren<Transform>(true);
 
                     foreach (Transform actualChild in childsAndParent) {
                         // replace UNET components with their mirror counterpart
-                        netComponentCount += ReplaceEveryNetworkComponent(actualChild.gameObject);
+                        int numNetworkComponentChanges = ReplaceEveryNetworkComponent(actualChild.gameObject);
+                        numChangesOnFile += numNetworkComponentChanges;
+                        netComponentCount += numNetworkComponentChanges;
 
                         // always replace NetworkIdentity as last element, due to dependencies
-                        netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
+                        int numNetIdentityChanges = ReplaceEveryNetworkIdentity(actualChild.gameObject);
+                        numChangesOnFile += numNetIdentityChanges;
+                        netIdComponentsCount += numNetIdentityChanges;
 
                         // check for obsolete components
                         int compObsolete = 0;
                         logErrors += CheckObsoleteComponents(actualChild.gameObject, out compObsolete);
                         netComponentObsolete += compObsolete;
                     }
+
+                    if (numChangesOnFile > 1)
+                        PrefabUtility.SaveAsPrefabAsset(prefab, relativepath);
+                    
+                    PrefabUtility.UnloadPrefabContents(prefab);
                 }
 
                 Debug.LogFormat("Searched {0} Prefabs, found {1} UNET NetworkIdentity, {2} Components and replaced them with Mirror components.\nAlso found {3} now deprecated components.", gameObjectCount, netIdComponentsCount, netComponentCount, netComponentObsolete);
@@ -100,8 +119,7 @@ namespace Mirror.MigrationUtilities {
                         netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
 
                         // check for obsolete components
-                        int compObsolete = 0;
-                        logErrors += CheckObsoleteComponents(actualChild.gameObject, out compObsolete);
+                        logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
                         netComponentObsolete += compObsolete;
                     }
                 }

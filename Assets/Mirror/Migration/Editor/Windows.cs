@@ -10,9 +10,8 @@ public class Windows : EditorWindow {
             "\nNote: Depending on your project size, it could take lot of time. Please don't close Unity during the process to avoid corrupted project." +
             "\nAlso, please be sure you made a backup of your project, just in case.",
             "Yes, farewell UNET!", "Cancel")) {
-            int netComponentObsolete = 0;
 
-            Components.FindAndReplaceUnetComponents(out netComponentObsolete);
+            Components.FindAndReplaceUnetComponents(out int netComponentObsolete);
 
             if (netComponentObsolete > 0) {
                 EditorUtility.DisplayDialog("Warning",
@@ -29,9 +28,8 @@ public class Windows : EditorWindow {
             "\nNote: Depending on your scene size, it could take lot of time. Please don't close Unity during the process to avoid corrupted scene." +
             "\nAlso, please be sure you made a backup of your project, just in case.",
             "Yes, farewell UNET!", "Cancel")) {
-            int netComponentObsolete = 0;
 
-            Components.FindAndReplaceUnetSceneGameObject(out netComponentObsolete);
+            Components.FindAndReplaceUnetSceneGameObject(out int netComponentObsolete);
 
             if (netComponentObsolete > 0) {
                 EditorUtility.DisplayDialog("Warning",
