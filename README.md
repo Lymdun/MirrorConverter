@@ -2,11 +2,11 @@
 
 This is a tool which automatically convert your UNET project to Mirror project, including components, prefabs and scripts.  
 Based on Mirror [migration guide](https://vis2k.github.io/Mirror/General/Migration), this tool is able to do alone the following steps: 
-- 3. Replace namespace
-- 4. Remove NetworkSettings
-- 5. Rename SyncListStruct to SyncListSTRUCT
-- 6. Replace NetworkHash128 and NetworkInstanceId
-- 8. Replace Components
+- Replace namespace
+- Remove NetworkSettings
+- Rename SyncListStruct to SyncListSTRUCT
+- Replace NetworkHash128 and NetworkInstanceId
+- Replace Components
 
 Others steps are needed to be done by you.
 
