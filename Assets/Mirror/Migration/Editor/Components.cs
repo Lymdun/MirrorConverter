@@ -1,4 +1,4 @@
-#pragma warning disable 0618
+﻿#pragma warning disable 0618
 using System.IO;
 using System.Collections.Generic;
 using UnityEditor;
@@ -12,6 +12,7 @@ using UnetNetworkTransform = UnityEngine.Networking.NetworkTransform;
 using UnetNetworkTransformChild = UnityEngine.Networking.NetworkTransformChild;
 using UnetNetworkLobbyManager = UnityEngine.Networking.NetworkLobbyManager;
 using UnetNetworkLobbyPlayer = UnityEngine.Networking.NetworkLobbyPlayer;
+using UnetNetworkManagerHUD = UnityEngine.Networking.NetworkManagerHUD;
 
 using UnetNetworkDiscovery = UnityEngine.Networking.NetworkDiscovery;
 
@@ -24,6 +25,7 @@ using MirrorNetworkTransform = Mirror.NetworkTransform;
 using MirrorNetworkTransformChild = Mirror.NetworkTransformChild;
 using MirrorNetworkLobbyManager = Mirror.NetworkLobbyManager;
 using MirrorNetworkLobbyPlayer = Mirror.NetworkLobbyPlayer;
+using MirrorNetworkManagerHUD = Mirror.NetworkManagerHUD;
 
 namespace Mirror.MigrationUtilities {
     public class Components : MonoBehaviour {
@@ -138,6 +140,7 @@ namespace Mirror.MigrationUtilities {
 
             compCount += Utils.ReplaceNetworkComponent<UnetNetworkAnimator, MirrorNetworkAnimator>(go);
             compCount += Utils.ReplaceNetworkComponent<UnetNetworkTransform, MirrorNetworkTransform>(go);
+            compCount += Utils.ReplaceNetworkComponent<UnetNetworkManagerHUD, MirrorNetworkManagerHUD>(go);
             compCount += Utils.ReplaceNetworkComponent<UnetNetworkManager, MirrorNetworkManager>(go);
             compCount += Utils.ReplaceNetworkComponent<UnetNetworkProximityChecker, MirrorNetworkProximityChecker>(go);
             compCount += Utils.ReplaceNetworkComponent<UnetNetworkStartPosition, MirrorNetworkStartPosition>(go);
