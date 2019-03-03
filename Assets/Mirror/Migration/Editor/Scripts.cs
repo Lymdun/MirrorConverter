@@ -20,7 +20,8 @@ namespace Mirror.MigrationUtilities {
                 @"\[SyncEvent([^\],]*)\]",   // SyncEvents (over non-reliable channels) - seriously?
                 "NetworkHash128",
                 "NetworkInstanceId",
-                "GetNetworkSendInterval()"
+                "GetNetworkSendInterval()",
+                "NetworkServer.connections"
             };
 
         public static readonly string[] knownCompatibleReplacements = {
@@ -31,7 +32,8 @@ namespace Mirror.MigrationUtilities {
                 "[SyncEvent]",
                 "System.Guid",
                 "uint",
-                "syncInterval"
+                "syncInterval",
+                "NetworkServer.connections.Values"
             };
 
         static int filesModified = 0;
