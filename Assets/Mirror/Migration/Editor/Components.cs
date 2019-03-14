@@ -1,4 +1,4 @@
-﻿#pragma warning disable 0618
+#pragma warning disable 0618
 using System.IO;
 using System.Collections.Generic;
 using UnityEditor;
@@ -162,7 +162,7 @@ namespace Mirror.MigrationUtilities {
             string errors = "";
             compObsolete = 0;
 
-            // TODO: others obsolete components from original UNET (and not HLAPI_CE) like lobby
+            // TODO: others obsolete components from original UNET (and not HLAPI_CE)
             if (go.GetComponent<UnetNetworkDiscovery>()) {
                 compObsolete++;
                 errors += go.name + "\n";
