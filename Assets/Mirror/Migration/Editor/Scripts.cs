@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -78,8 +78,15 @@ namespace Mirror.MigrationUtilities {
                     return;
                 }
 
+                bool backupFiles = false;
+                if (EditorUtility.DisplayDialog("Scripts Backup", "Do you want to backup each script which are going to be converted?\n" +
+                "If so, each script will be saved as .bak file. You can delete it later if needed.",
+                "Yes", "No")) {
+                    backupFiles = true;
+                }
+
                 // Okay, let's do this!
-                ProcessFiles(filesToScanAndModify);
+                ProcessFiles(filesToScanAndModify, backupFiles);
 
                 Debug.Log("[Mirror Migration Tool] Processed (and patched, if required) " + filesModified + " files");
 
@@ -96,7 +103,7 @@ namespace Mirror.MigrationUtilities {
             }
         }
 
-        private static void ProcessFiles(List<string> filesToProcess) {
+        private static void ProcessFiles(List<string> filesToProcess, bool backupFiles) {
             StreamReader sr;
             StreamWriter sw;
 
@@ -166,7 +173,8 @@ namespace Mirror.MigrationUtilities {
 
                     // Backup the old files for safety.
                     // The user can delete them later.
-                    if (!File.Exists(file + ".bak")) File.Copy(file, file + ".bak");
+                    if (backupFiles && !File.Exists(file + ".bak"))
+                        File.Copy(file, file + ".bak");
 
                     // Now the job is done, we want to write the data out to disk... 
                     using (sw = new StreamWriter(file, false, Encoding.UTF8)) {
