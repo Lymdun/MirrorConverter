@@ -72,8 +72,7 @@ namespace Mirror.MigrationUtilities {
                         netIdComponentsCount += numNetIdentityChanges;
 
                         // check for obsolete components
-                        int compObsolete = 0;
-                        logErrors += CheckObsoleteComponents(actualChild.gameObject, out compObsolete);
+                        logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
                         netComponentObsolete += compObsolete;
                     }
 
