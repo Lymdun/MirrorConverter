@@ -77,7 +77,7 @@ namespace Mirror.MigrationUtilities {
                         netComponentObsolete += compObsolete;
                     }
 
-                    if (numChangesOnFile > 1)
+                    if (numChangesOnFile >= 1)
                         PrefabUtility.SaveAsPrefabAsset(prefab, relativepath);
                     
                     PrefabUtility.UnloadPrefabContents(prefab);
