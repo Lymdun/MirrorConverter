@@ -115,6 +115,9 @@ namespace Mirror.MigrationUtilities {
                         sr.Close();
                     }
 
+                    // store initial buffer to use in final comparison before writing out file
+                    var initialBuffer = scriptBuffer;
+
                     if (scriptBuffer.Contains("UnityWebRequest") && !scriptBuffer.Contains("using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;")) {
                         int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
                         scriptBuffer = scriptBuffer.Insert(correctIndex, "using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;" + System.Environment.NewLine);
@@ -176,10 +179,12 @@ namespace Mirror.MigrationUtilities {
                     if (backupFiles && !File.Exists(file + ".bak"))
                         File.Copy(file, file + ".bak");
 
-                    // Now the job is done, we want to write the data out to disk... 
-                    using (sw = new StreamWriter(file, false, Encoding.UTF8)) {
-                        sw.WriteLine(scriptBuffer);
-                        sw.Close();
+                    // Now the job is done, we want to write the data out to disk ONLY if the contents were actually changed... 
+                    if (initialBuffer != scriptBuffer) {
+                        using (sw = new StreamWriter(file, false, new UTF8Encoding(false))) {
+                            sw.Write(scriptBuffer.TrimStart());
+                            sw.Close();
+                        }
                     }
 
                     // Increment the modified counter for statistics.
