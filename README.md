@@ -12,7 +12,8 @@ Others steps are needed to be done by you.
 
 ## Installation
 
-Download this repo, and put the inside of Assets\Mirror inside the Mirror folder of your project. 
+Simply download latest [release](https://github.com/Lymdun/MirrorConverter/releases) and import it on Unity.
+Or, you can download this repo, and put the inside of Assets\Mirror inside the Mirror folder of your project. 
 
 ## Usage
 
