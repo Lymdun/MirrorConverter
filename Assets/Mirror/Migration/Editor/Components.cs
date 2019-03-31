@@ -108,6 +108,9 @@ namespace Mirror.MigrationUtilities {
 
             foreach (GameObject currentGameObject in allObjects) {
                 if (currentGameObject.scene.isLoaded) {
+                    if (currentGameObject.hideFlags == HideFlags.NotEditable || currentGameObject.hideFlags == HideFlags.HideAndDontSave)
+                        continue;
+
                     convertedGoCounter++;
                     EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} game object scanned...", convertedGoCounter, gameObjectCount), convertedGoCounter / gameObjectCount);
 
