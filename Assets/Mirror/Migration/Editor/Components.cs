@@ -1,5 +1,6 @@
 #pragma warning disable 0618
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -26,6 +27,7 @@ using MirrorNetworkTransformChild = Mirror.NetworkTransformChild;
 using MirrorNetworkLobbyManager = Mirror.NetworkLobbyManager;
 using MirrorNetworkLobbyPlayer = Mirror.NetworkLobbyPlayer;
 using MirrorNetworkManagerHUD = Mirror.NetworkManagerHUD;
+using UnityEngine.SceneManagement;
 
 namespace Mirror.MigrationUtilities {
     public class Components : MonoBehaviour {
@@ -103,30 +105,29 @@ namespace Mirror.MigrationUtilities {
 
             // safest way to get all gameObjects on the scene instead of FindObjectOfType()
             GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+            IEnumerable<GameObject> allObjetsInScene = allObjects.Where(x => x.scene == SceneManager.GetActiveScene());
 
-            int gameObjectCount = allObjects.Length;
+            int gameObjectCount = allObjetsInScene.Count();
 
-            foreach (GameObject currentGameObject in allObjects) {
-                if (currentGameObject.scene.isLoaded) {
-                    if (currentGameObject.hideFlags == HideFlags.NotEditable || currentGameObject.hideFlags == HideFlags.HideAndDontSave)
-                        continue;
+            foreach (GameObject currentGameObject in allObjetsInScene) {
+                if (currentGameObject.hideFlags == HideFlags.NotEditable || currentGameObject.hideFlags == HideFlags.HideAndDontSave)
+                    continue;
 
-                    convertedGoCounter++;
-                    EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} game object scanned...", convertedGoCounter, gameObjectCount), convertedGoCounter / gameObjectCount);
+                convertedGoCounter++;
+                EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} game object scanned...", convertedGoCounter, gameObjectCount), convertedGoCounter / gameObjectCount);
 
-                    IEnumerable<Transform> childsAndParent = currentGameObject.GetComponentsInChildren<Transform>(true);
+                IEnumerable<Transform> childsAndParent = currentGameObject.GetComponentsInChildren<Transform>(true);
 
-                    foreach (Transform actualChild in childsAndParent) {
-                        // replace UNET components with their mirror counterpart
-                        netComponentCount += ReplaceEveryNetworkComponent(actualChild.gameObject);
+                foreach (Transform actualChild in childsAndParent) {
+                    // replace UNET components with their mirror counterpart
+                    netComponentCount += ReplaceEveryNetworkComponent(actualChild.gameObject);
 
-                        // always replace NetworkIdentity as last element, due to dependencies
-                        netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
+                    // always replace NetworkIdentity as last element, due to dependencies
+                    netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
 
-                        // check for obsolete components
-                        logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
-                        netComponentObsolete += compObsolete;
-                    }
+                    // check for obsolete components
+                    logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
+                    netComponentObsolete += compObsolete;
                 }
             }
 
