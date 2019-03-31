@@ -62,9 +62,6 @@ namespace Mirror.MigrationUtilities {
                 if (targetProperty.GetSetMethod(true) != null && targetProperty.GetSetMethod(true).IsPrivate) 
                     continue;
                 
-                if ((targetProperty.GetSetMethod().Attributes & MethodAttributes.Static) != 0) 
-                    continue;
-                
                 if (!targetProperty.PropertyType.IsAssignableFrom(srcProp.PropertyType)) 
                     continue;
 
