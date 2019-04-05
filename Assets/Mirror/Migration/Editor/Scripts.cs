@@ -13,19 +13,20 @@ namespace Mirror.MigrationUtilities {
         static readonly string scriptExtension = "*.cs";
 
         public static readonly string[] knownIncompatibleRegexes = {
-                "SyncListStruct",   // this probably needs improvement but i didn't want to duplicate lines of code
-                @"\[Command([^\],]*)\]",    // Commands over non-reliable channels
-                @"\[ClientRpc([^\],]*)\]",  // ClientRPCs over non-reliable channels
-                @"\[TargetRpc([^\],]*)\]",  // TargetRPCs over non-reliable channels
-                @"\[SyncEvent([^\],]*)\]",   // SyncEvents (over non-reliable channels) - seriously?
+                "SyncListStruct",
+                @"\[Command([^\],]*)\]",
+                @"\[ClientRpc([^\],]*)\]",
+                @"\[TargetRpc([^\],]*)\]",
+                @"\[SyncEvent([^\],]*)\]",
                 "NetworkHash128",
                 "NetworkInstanceId",
                 "GetNetworkSendInterval()",
-                "NetworkServer.connections"
+                "NetworkServer.connections",
+                "NetworkManager.singleton.client"
             };
 
         public static readonly string[] knownCompatibleReplacements = {
-                "SyncListSTRUCT",   // because mirror's version is moar bettah.
+                "SyncList",
                 "[Command]",
                 "[ClientRpc]",
                 "[TargetRpc]",
@@ -33,7 +34,8 @@ namespace Mirror.MigrationUtilities {
                 "System.Guid",
                 "uint",
                 "syncInterval",
-                "NetworkServer.connections.Values"
+                "NetworkServer.connections.Values",
+                "NetworkClient"
             };
 
         static int filesModified = 0;
@@ -123,8 +125,10 @@ namespace Mirror.MigrationUtilities {
                         scriptBuffer = scriptBuffer.Insert(correctIndex, "using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;" + System.Environment.NewLine);
                     }
 
-                    // Get outta here, UnityEngine.Networking !
                     scriptBuffer = scriptBuffer.Replace("using UnityEngine.Networking;", "using Mirror;");
+
+                    // since [] characters are used by Regex, need to replace it by ourself
+                    scriptBuffer = scriptBuffer.Replace("NetworkClient.allClients[0]", "NetworkClient");
 
                     // Work our magic.
                     for (int i = 0; i < knownIncompatibleRegexes.Length; i++) {
