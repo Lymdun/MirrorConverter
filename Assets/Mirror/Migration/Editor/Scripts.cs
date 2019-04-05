@@ -178,6 +178,15 @@ namespace Mirror.MigrationUtilities {
                         }
                     }
 
+                    // let comment SetChannelOption, since its not used anymore
+                    matches = Regex.Matches(scriptBuffer, ".+SetChannelOption(.+)");
+                    if (matches.Count > 0) {
+                        foreach (Match match in matches) {
+                            string newLine = "// ----- OBSOLETE | YOU CAN REMOVE THIS LINE (MIRROR) -----" + match.Value;
+                            scriptBuffer = scriptBuffer.Replace(match.Value, newLine);
+                        }
+                    }
+
                     // Backup the old files for safety.
                     // The user can delete them later.
                     if (backupFiles && !File.Exists(file + ".bak"))
