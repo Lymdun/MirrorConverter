@@ -114,7 +114,6 @@ namespace Mirror.MigrationUtilities {
                     // Open and load it into the script buffer.
                     using (sr = new StreamReader(file)) {
                         scriptBuffer = sr.ReadToEnd();
-                        sr.Close();
                     }
 
                     // store initial buffer to use in final comparison before writing out file
