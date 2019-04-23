@@ -80,10 +80,12 @@ namespace Mirror.MigrationUtilities {
                         // remove missing components (mono scripts)
                         if (numChangesOnFile >= 1) {
 #if UNITY_2019_1_OR_NEWER
-                            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(actualChild.gameObject);
+                            int removedComponentCount = GameObjectUtility.RemoveMonoBehavioursWithMissingScript(actualChild.gameObject);
 #else
-                            RemoveMissingComponents(actualChild.gameObject);
+                            int removedComponentCount = RemoveMissingComponents(actualChild.gameObject);
 #endif
+
+                            Debug.LogError("Had to remove " + removedComponentCount + " missing components in the following prefab:" + actualChild.gameObject.name + " otherwise it's impossible to save it.");
                         }
                     }
 
@@ -181,20 +183,21 @@ namespace Mirror.MigrationUtilities {
         }
 
         // remove ALL missing components from a gameobject, otherwise we can't save it as a prefab
-        static void RemoveMissingComponents(GameObject go) {
+        static int RemoveMissingComponents(GameObject go) {
             SerializedObject serializedChild = new SerializedObject(go);
             SerializedProperty serializedComponent = serializedChild.FindProperty("m_Component");
             Component[] components = go.GetComponents<Component>();
-            int r = 0;
+            int removedComponentCount = 0;
 
             for (int i = 0; i < components.Length; i++) {
                 if (components[i] == null) {
-                    serializedComponent.DeleteArrayElementAtIndex(i - r);
-                    ++r;
+                    serializedComponent.DeleteArrayElementAtIndex(i - removedComponentCount);
+                    ++removedComponentCount;
                 } 
             }
 
             serializedChild.ApplyModifiedPropertiesWithoutUndo();
+            return removedComponentCount;
         }
     }
 }
