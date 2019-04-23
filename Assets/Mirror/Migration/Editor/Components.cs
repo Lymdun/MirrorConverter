@@ -52,7 +52,7 @@ namespace Mirror.MigrationUtilities {
 
                     GameObject prefab;
                     try {
-                        prefab = PrefabUtility.LoadPrefabContents(relativepath);
+                        prefab = AssetDatabase.LoadAssetAtPath(relativepath, typeof(GameObject)) as GameObject;
                     } catch (System.Exception) {
                         continue;
                     }
@@ -76,14 +76,15 @@ namespace Mirror.MigrationUtilities {
                         // check for obsolete components
                         logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
                         netComponentObsolete += compObsolete;
+
+                        // remove missing components (mono scripts)
+                        if (numChangesOnFile >= 1)
+                            RemoveMissingComponents(actualChild.gameObject);
                     }
 
                     if (numChangesOnFile >= 1)
-                        PrefabUtility.SaveAsPrefabAsset(prefab, relativepath);
-                    
-                    PrefabUtility.UnloadPrefabContents(prefab);
+                        PrefabUtility.ReplacePrefab(prefab, AssetDatabase.LoadAssetAtPath<Object>(prefab.name + ".prefab"));
                 }
-
                 Debug.LogFormat("Searched {0} Prefabs, found {1} UNET NetworkIdentity, {2} Components and replaced them with Mirror components.\nAlso found {3} now deprecated components.", gameObjectCount, netIdComponentsCount, netComponentCount, netComponentObsolete);
 
                 if (netComponentObsolete > 0)
@@ -172,6 +173,23 @@ namespace Mirror.MigrationUtilities {
             }
 
             return errors;
+        }
+
+        // remove ALL missing components from a gameobject, otherwise we can't save it as a prefab
+        static void RemoveMissingComponents(GameObject go) {
+            SerializedObject serializedChild = new SerializedObject(go);
+            SerializedProperty serializedComponent = serializedChild.FindProperty("m_Component");
+            Component[] components = go.GetComponents<Component>();
+            int r = 0;
+
+            for (int i = 0; i < components.Length; i++) {
+                if (components[i] == null) {
+                    serializedComponent.DeleteArrayElementAtIndex(i - r);
+                    ++r;
+                } 
+            }
+
+            serializedChild.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 }
