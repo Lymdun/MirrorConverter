@@ -84,8 +84,8 @@ namespace Mirror.MigrationUtilities {
 #else
                             int removedComponentCount = RemoveMissingComponents(actualChild.gameObject);
 #endif
-
-                            Debug.LogError("Had to remove " + removedComponentCount + " missing components in the following prefab:" + actualChild.gameObject.name + " otherwise it's impossible to save it.");
+                            if (removedComponentCount > 0)
+                                Debug.LogError("Had to remove " + removedComponentCount + " missing components in the following prefab:" + actualChild.gameObject.name + " otherwise it's impossible to save it.");
                         }
                     }
 
