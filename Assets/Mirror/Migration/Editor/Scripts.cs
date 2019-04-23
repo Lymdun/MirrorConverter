@@ -196,7 +196,6 @@ namespace Mirror.MigrationUtilities {
                     if (initialBuffer != scriptBuffer) {
                         using (sw = new StreamWriter(file, false, new UTF8Encoding(false))) {
                             sw.Write(scriptBuffer.TrimStart());
-                            sw.Close();
                         }
                     }
 
