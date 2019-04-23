@@ -78,8 +78,13 @@ namespace Mirror.MigrationUtilities {
                         netComponentObsolete += compObsolete;
 
                         // remove missing components (mono scripts)
-                        if (numChangesOnFile >= 1)
+                        if (numChangesOnFile >= 1) {
+#if UNITY_2019_1_OR_NEWER
+                            GameObjectUtility.RemoveMonoBehavioursWithMissingScript(actualChild.gameObject);
+#else
                             RemoveMissingComponents(actualChild.gameObject);
+#endif
+                        }
                     }
 
                     if (numChangesOnFile >= 1)
