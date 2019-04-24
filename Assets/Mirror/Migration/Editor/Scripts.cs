@@ -141,10 +141,8 @@ namespace Mirror.MigrationUtilities {
                     // store initial buffer to use in final comparison before writing out file
                     var initialBuffer = scriptBuffer;
                     
-                    if (scriptBuffer.Contains("using UnityEngine.Networking;")
-                    {
-                        foreach (string type in notUnetTypes)
-                        { 
+                    if (scriptBuffer.Contains("using UnityEngine.Networking;")) {
+                        foreach (string type in notUnetTypes) { 
                             if (scriptBuffer.Contains(type) && !scriptBuffer.Contains("using " + type)) {
                                 int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
                                 scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + System.Environment.NewLine);
