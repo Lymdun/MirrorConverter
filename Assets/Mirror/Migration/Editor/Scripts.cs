@@ -38,6 +38,28 @@ namespace Mirror.MigrationUtilities {
                 "NetworkClient"
             };
 
+        public static readonly string[] notUnetTypes = {
+                "CertificateHandler",
+                "DownloadHandler",
+                "DownloadHandlerAssetBundle",
+                "DownloadHandlerAudioClip",
+                "DownloadHandlerBuffer",
+                "DownloadHandlerFile",
+                "DownloadHandlerMovieTexture",
+                "DownloadHandlerScript",
+                "DownloadHandlerTexture",
+                "MultipartFormDataSection",
+                "MultipartFormFileSection",
+                "UnityWebRequest",
+                "UnityWebRequestAssetBundle",
+                "UnityWebRequestAsyncOperation",
+                "UnityWebRequestMultimedia",
+                "UnityWebRequestTexture",
+                "UploadHandler",
+                "UploadHandlerFile",
+                "UploadHandlerRaw"
+            };
+
         static int filesModified = 0;
         static string scriptBuffer = string.Empty;
         static MatchCollection matches;
@@ -118,10 +140,14 @@ namespace Mirror.MigrationUtilities {
 
                     // store initial buffer to use in final comparison before writing out file
                     var initialBuffer = scriptBuffer;
-
-                    if (scriptBuffer.Contains("UnityWebRequest") && !scriptBuffer.Contains("using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;")) {
-                        int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
-                        scriptBuffer = scriptBuffer.Insert(correctIndex, "using UnityWebRequest = UnityEngine.Networking.UnityWebRequest;" + System.Environment.NewLine);
+                    
+                    if (scriptBuffer.Contains("using UnityEngine.Networking;")) {
+                        foreach (string type in notUnetTypes) { 
+                            if (scriptBuffer.Contains(type) && !scriptBuffer.Contains("using " + type)) {
+                                int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
+                                scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + System.Environment.NewLine);
+                            }
+                        }
                     }
 
                     scriptBuffer = scriptBuffer.Replace("using UnityEngine.Networking;", "using Mirror;");
