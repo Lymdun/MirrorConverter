@@ -48,7 +48,7 @@ namespace Mirror.MigrationUtilities {
                     int numChangesOnFile = 0;
                     string relativepath = "Assets" + file.Substring(Application.dataPath.Length);
 
-                    EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} files scanned...", fileCounter, gameObjectCount), fileCounter / gameObjectCount);
+                    EditorUtility.DisplayProgressBar("Mirror Migration Progress", $"{fileCounter} of {gameObjectCount} files scanned...", fileCounter / gameObjectCount);
 
                     GameObject prefab;
                     try {
@@ -69,9 +69,10 @@ namespace Mirror.MigrationUtilities {
                         netComponentCount += numNetworkComponentChanges;
 
                         // always replace NetworkIdentity as last element, due to dependencies
-                        int numNetIdentityChanges = ReplaceEveryNetworkIdentity(actualChild.gameObject);
-                        numChangesOnFile += numNetIdentityChanges;
-                        netIdComponentsCount += numNetIdentityChanges;
+                        if (ReplaceEveryNetworkIdentity(actualChild.gameObject)) {
+                            numChangesOnFile++;
+                            netIdComponentsCount++;
+                        }
 
                         // check for obsolete components
                         logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
@@ -122,7 +123,7 @@ namespace Mirror.MigrationUtilities {
                     continue;
 
                 convertedGoCounter++;
-                EditorUtility.DisplayProgressBar("Mirror Migration Progress", string.Format("{0} of {1} game object scanned...", convertedGoCounter, gameObjectCount), convertedGoCounter / gameObjectCount);
+                EditorUtility.DisplayProgressBar("Mirror Migration Progress", $"{convertedGoCounter} of {gameObjectCount} game object scanned...", convertedGoCounter / gameObjectCount);
 
                 IEnumerable<Transform> childsAndParent = currentGameObject.GetComponentsInChildren<Transform>(true);
 
@@ -131,7 +132,7 @@ namespace Mirror.MigrationUtilities {
                     netComponentCount += ReplaceEveryNetworkComponent(actualChild.gameObject);
 
                     // always replace NetworkIdentity as last element, due to dependencies
-                    netIdComponentsCount += ReplaceEveryNetworkIdentity(actualChild.gameObject);
+                    if (ReplaceEveryNetworkIdentity(actualChild.gameObject)) netIdComponentsCount++;
 
                     // check for obsolete components
                     logErrors += CheckObsoleteComponents(actualChild.gameObject, out int compObsolete);
@@ -149,24 +150,21 @@ namespace Mirror.MigrationUtilities {
         static int ReplaceEveryNetworkComponent(GameObject go) {
             int compCount = 0;
 
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkAnimator, MirrorNetworkAnimator>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkTransform, MirrorNetworkTransform>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkManagerHUD, MirrorNetworkManagerHUD>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkManager, MirrorNetworkManager>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkProximityChecker, MirrorNetworkProximityChecker>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkStartPosition, MirrorNetworkStartPosition>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkTransformChild, MirrorNetworkTransformChild>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkLobbyManager, MirrorNetworkLobbyManager>(go);
-            compCount += Utils.ReplaceNetworkComponent<UnetNetworkLobbyPlayer, MirrorNetworkLobbyPlayer>(go);
+            if (Utils.ReplaceNetworkComponent<UnetNetworkAnimator, MirrorNetworkAnimator>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkTransform, MirrorNetworkTransform>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkManagerHUD, MirrorNetworkManagerHUD>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkManager, MirrorNetworkManager>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkProximityChecker, MirrorNetworkProximityChecker>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkStartPosition, MirrorNetworkStartPosition>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkTransformChild, MirrorNetworkTransformChild>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkLobbyManager, MirrorNetworkLobbyManager>(go)) compCount++;
+            if (Utils.ReplaceNetworkComponent<UnetNetworkLobbyPlayer, MirrorNetworkLobbyPlayer>(go)) compCount++;
 
             return compCount;
         }
 
-        static int ReplaceEveryNetworkIdentity(GameObject go) {
-            int niCount = 0;
-            niCount += Utils.ReplaceNetworkComponent<UnetNetworkIdentity, MirrorNetworkIdentity>(go);
-
-            return niCount;
+        static bool ReplaceEveryNetworkIdentity(GameObject go) {
+            return Utils.ReplaceNetworkIdentity(go);
         }
 
         static string CheckObsoleteComponents(GameObject go, out int compObsolete) {

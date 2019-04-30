@@ -22,6 +22,7 @@ namespace Mirror.MigrationUtilities {
                 "NetworkInstanceId",
                 "GetNetworkSendInterval()",
                 "NetworkServer.connections",
+                "NetworkServer.connections.Values.Values",
                 "NetworkManager.singleton.client"
             };
 
@@ -34,6 +35,7 @@ namespace Mirror.MigrationUtilities {
                 "System.Guid",
                 "uint",
                 "syncInterval",
+                "NetworkServer.connections.Values",
                 "NetworkServer.connections.Values",
                 "NetworkClient"
             };
@@ -96,18 +98,15 @@ namespace Mirror.MigrationUtilities {
                 }
 
                 // Final chance to abort.
-                if (!EditorUtility.DisplayDialog("Continue?", string.Format("We've found {0} file(s) that may need updating. Depending on your hardware and storage, " +
-                    "this might take a while. Do you wish to continue the process?", filesToScanAndModify.Count), "Go ahead!", "Abort")) {
+                if (!EditorUtility.DisplayDialog("Continue?", $"We've found {filesToScanAndModify.Count} file(s) that may need updating. Depending on your hardware and storage, " + "this might take a while. Do you wish to continue the process?", "Go ahead!", "Abort")) {
                     EditorUtility.DisplayDialog("Aborted", "You opted to abort the migration process. Please come back once you're ready to migrate.", "Got it");
                     return;
                 }
 
-                bool backupFiles = false;
-                if (EditorUtility.DisplayDialog("Scripts Backup", "Do you want to backup each script which are going to be converted?\n" +
-                "If so, each script will be saved as .bak file. You can delete it later if needed.",
-                "Yes", "No")) {
-                    backupFiles = true;
-                }
+                bool backupFiles = EditorUtility.DisplayDialog("Scripts Backup", 
+                    "Do you want to backup each script which are going to be converted?\n" +
+                    "If so, each script will be saved as .bak file. You can delete it later if needed.",
+                    "Yes", "No");
 
                 // Okay, let's do this!
                 ProcessFiles(filesToScanAndModify, backupFiles);
@@ -132,11 +131,15 @@ namespace Mirror.MigrationUtilities {
             StreamWriter sw;
 
             foreach (string file in filesToProcess) {
-                try {
+                try
+                {
+                    Encoding encoding = Utils.GetEncoding(file);
                     // Open and load it into the script buffer.
-                    using (sr = new StreamReader(file)) {
+                    using (sr = new StreamReader(file, encoding)) {
                         scriptBuffer = sr.ReadToEnd();
                     }
+
+                    if (scriptBuffer.Contains("namespace Mirror")) continue;
 
                     // store initial buffer to use in final comparison before writing out file
                     var initialBuffer = scriptBuffer;
@@ -150,7 +153,7 @@ namespace Mirror.MigrationUtilities {
                         }
                     }
 
-                    scriptBuffer = scriptBuffer.Replace("using UnityEngine.Networking;", "using Mirror;");
+                    scriptBuffer = scriptBuffer.Replace("using UnityEngine.Networking;", scriptBuffer.Contains("using Mirror;") ? "" : "using Mirror;");
 
                     // since [] characters are used by Regex, need to replace it by ourself
                     scriptBuffer = scriptBuffer.Replace("NetworkClient.allClients[0]", "NetworkClient");
@@ -195,7 +198,7 @@ namespace Mirror.MigrationUtilities {
                                     // Replace it.
                                     if (netSettingArguments[0].Contains("channel")) {
                                         // Don't touch this.
-                                        scriptBuffer = scriptBuffer.Replace(string.Format("[{0}]", matches[i].Value), string.Empty);
+                                        scriptBuffer = scriptBuffer.Replace($"[{matches[i].Value}]", string.Empty);
                                     }
                                     // DONE!
                                 }
@@ -219,7 +222,7 @@ namespace Mirror.MigrationUtilities {
 
                     // Now the job is done, we want to write the data out to disk ONLY if the contents were actually changed... 
                     if (initialBuffer != scriptBuffer) {
-                        using (sw = new StreamWriter(file, false, new UTF8Encoding(false))) {
+                        using (sw = new StreamWriter(file, false, encoding)) {
                             sw.Write(scriptBuffer.TrimStart());
                         }
                     }
@@ -228,7 +231,7 @@ namespace Mirror.MigrationUtilities {
                     filesModified++;
                 } catch (System.Exception e) {
                     // Kaboom, this tool ate something it shouldn't have.
-                    Debug.LogError(string.Format("[Mirror Migration Tool] Encountered an exception processing {0}:\n{1}", file, e.ToString()));
+                    Debug.LogError($"[Mirror Migration Tool] Encountered an exception processing {file}:\n{e.ToString()}");
                 }
             }
         }
