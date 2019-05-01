@@ -21,6 +21,8 @@ namespace Mirror.MigrationUtilities {
             
             TSource unetNetworkComponent = prefab.GetComponent<TSource>();
             if (unetNetworkComponent != null) {
+                //ignore deriving classes (they should be changed by the script conversion)
+                if (unetNetworkComponent.GetType() != typeof(TSource)) return false;
 
                 // check for mirror component
                 TDestination mirrorNetworkComponent = prefab.AddComponent<TDestination>();
