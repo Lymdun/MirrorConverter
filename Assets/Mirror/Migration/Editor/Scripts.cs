@@ -23,7 +23,17 @@ namespace Mirror.MigrationUtilities {
                 "GetNetworkSendInterval()",
                 "NetworkServer.connections",
                 "NetworkServer.connections.Values.Values",
-                "NetworkManager.singleton.client"
+                "NetworkManager.singleton.client",
+                "UnityEngine.Networking.NetworkAnimator",
+                "UnityEngine.Networking.NetworkIdentity",
+                "UnityEngine.Networking.NetworkManager",
+                "UnityEngine.Networking.NetworkProximityChecker",
+                "UnityEngine.Networking.NetworkStartPosition",
+                "UnityEngine.Networking.NetworkTransform",
+                "UnityEngine.Networking.NetworkTransformChild",
+                "UnityEngine.Networking.NetworkLobbyManager",
+                "UnityEngine.Networking.NetworkLobbyPlayer",
+                "UnityEngine.Networking.NetworkManagerHUD"
             };
 
         public static readonly string[] knownCompatibleReplacements = {
@@ -37,11 +47,24 @@ namespace Mirror.MigrationUtilities {
                 "syncInterval",
                 "NetworkServer.connections.Values",
                 "NetworkServer.connections.Values",
-                "NetworkClient"
+                "NetworkClient",
+                "Mirror.NetworkAnimator",
+                "Mirror.NetworkIdentity",
+                "Mirror.NetworkManager",
+                "Mirror.NetworkProximityChecker",
+                "Mirror.NetworkStartPosition",
+                "Mirror.NetworkTransform",
+                "Mirror.NetworkTransformChild",
+                "Mirror.NetworkLobbyManager",
+                "Mirror.NetworkLobbyPlayer",
+                "Mirror.NetworkManagerHUD"
             };
 
         public static readonly string[] notUnetTypes = {
                 "CertificateHandler",
+                "ChannelQOS",
+                "ConnectionConfig",
+                "ConnectionSimulatorConfig",
                 "DownloadHandler",
                 "DownloadHandlerAssetBundle",
                 "DownloadHandlerAudioClip",
@@ -50,8 +73,11 @@ namespace Mirror.MigrationUtilities {
                 "DownloadHandlerMovieTexture",
                 "DownloadHandlerScript",
                 "DownloadHandlerTexture",
+                "GlobalConfig",
+                "HostTopology",
                 "MultipartFormDataSection",
                 "MultipartFormFileSection",
+                "NetworkTransport",
                 "UnityWebRequest",
                 "UnityWebRequestAssetBundle",
                 "UnityWebRequestAsyncOperation",
@@ -59,7 +85,8 @@ namespace Mirror.MigrationUtilities {
                 "UnityWebRequestTexture",
                 "UploadHandler",
                 "UploadHandlerFile",
-                "UploadHandlerRaw"
+                "UploadHandlerRaw",
+                "Utility"
             };
 
         static int filesModified = 0;
