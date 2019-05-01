@@ -33,7 +33,8 @@ namespace Mirror.MigrationUtilities {
                 "UnityEngine.Networking.NetworkTransformChild",
                 "UnityEngine.Networking.NetworkLobbyManager",
                 "UnityEngine.Networking.NetworkLobbyPlayer",
-                "UnityEngine.Networking.NetworkManagerHUD"
+                "UnityEngine.Networking.NetworkManagerHUD",
+                "NetworkClient.GetRTT()"
             };
 
         public static readonly string[] knownCompatibleReplacements = {
@@ -57,7 +58,8 @@ namespace Mirror.MigrationUtilities {
                 "Mirror.NetworkTransformChild",
                 "Mirror.NetworkLobbyManager",
                 "Mirror.NetworkLobbyPlayer",
-                "Mirror.NetworkManagerHUD"
+                "Mirror.NetworkManagerHUD",
+                "((int)(NetworkTime.rtt*1000d))"
             };
 
         public static readonly string[] notUnetTypes = {
