@@ -168,7 +168,7 @@ namespace Mirror.MigrationUtilities {
                         scriptBuffer = sr.ReadToEnd();
                     }
 
-                    if (scriptBuffer.Contains("namespace Mirror")) continue;
+                    if (scriptBuffer.Contains("//MirrorConverter NoConversion") || scriptBuffer.Contains("namespace Mirror")) continue;
 
                     // store initial buffer to use in final comparison before writing out file
                     var initialBuffer = scriptBuffer;
