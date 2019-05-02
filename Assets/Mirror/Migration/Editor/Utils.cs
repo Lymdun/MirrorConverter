@@ -116,7 +116,7 @@ namespace Mirror.MigrationUtilities {
             }
         }
 
-        public static Encoding GetEncoding(string filename) {
+        public static Encoding GetEncoding(string filename, Encoding defaultEncoding = null) {
             // Read the BOM
             byte[] bom = new byte[4];
             using (FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read))
@@ -131,7 +131,7 @@ namespace Mirror.MigrationUtilities {
             if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff) return Utf32BeBomEncoding;
             if (bom[0] == 0xff && bom[1] == 0xfe) return Utf16LeBomEncoding;
             if (bom[0] == 0xfe && bom[1] == 0xff) return Utf16BeBomEncoding;
-            return Utf8NoBomEncoding;
+            return defaultEncoding;
         }
     }
 }

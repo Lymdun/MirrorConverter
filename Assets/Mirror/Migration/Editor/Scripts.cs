@@ -166,7 +166,7 @@ namespace Mirror.MigrationUtilities {
                     FileFormatting ff = LoadEditorConfig(file);
                     Encoding localencoding = ff.Encoding;
                     // Open and load it into the script buffer.
-                    using (sr = new StreamReader(file, localencoding)) {
+                    using (sr = new StreamReader(file, Utils.GetEncoding(file, localencoding))) {
                         scriptBuffer = sr.ReadToEnd();
                     }
 
@@ -277,7 +277,7 @@ namespace Mirror.MigrationUtilities {
                 string lineEnding = null;
                 switch (configurations.Length) {
                     case 0:
-                        return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath));
+                        return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding));
                     case 1:
                         currentConfiguration = configurations[0];
                         break;
@@ -287,7 +287,7 @@ namespace Mirror.MigrationUtilities {
                 }
                 switch (currentConfiguration.Charset) {
                     case null:
-                        encoding = Utils.GetEncoding(filepath);
+                        encoding = Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding);
                         break;
                     case Charset.Latin1:
                         encoding = Utils.Latin1Encoding;
@@ -346,7 +346,7 @@ namespace Mirror.MigrationUtilities {
                 return new FileFormatting(lineEnding, intend, encoding);
             }
 
-            return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath));
+            return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding));
         }
 
         /// <summary>
