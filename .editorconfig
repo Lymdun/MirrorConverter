@@ -1,6 +1,9 @@
 ############################### 
 # Core EditorConfig Options   # 
 ############################### 
+
+root = true
+
 # All files 
 [*] 
 indent_style = space 
@@ -8,7 +11,8 @@ indent_style = space
 [*.{cs,csx,vb,vbx}] 
 indent_size = 4 
 insert_final_newline = true 
-charset = utf-8-bom 
+charset = utf-8
+trim_trailing_whitespace = true
 ############################### 
 # .NET Coding Conventions     # 
 ############################### 
