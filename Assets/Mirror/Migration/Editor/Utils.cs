@@ -116,7 +116,7 @@ namespace Mirror.MigrationUtilities {
             }
         }
 
-        public static Encoding GetEncoding(string filename, Encoding defaultEncoding = null) {
+        public static Encoding GetEncoding(string filename, Encoding defaultEncoding) {
             // Read the BOM
             byte[] bom = new byte[4];
             using (FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read))
