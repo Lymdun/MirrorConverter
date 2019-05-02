@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using EditorConfig.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,7 +24,19 @@ namespace Mirror.MigrationUtilities {
                 "NetworkInstanceId",
                 "GetNetworkSendInterval()",
                 "NetworkServer.connections",
-                "NetworkManager.singleton.client"
+                "NetworkServer.connections.Values.Values",
+                "NetworkManager.singleton.client",
+                "UnityEngine.Networking.NetworkAnimator",
+                "UnityEngine.Networking.NetworkIdentity",
+                "UnityEngine.Networking.NetworkManager",
+                "UnityEngine.Networking.NetworkProximityChecker",
+                "UnityEngine.Networking.NetworkStartPosition",
+                "UnityEngine.Networking.NetworkTransform",
+                "UnityEngine.Networking.NetworkTransformChild",
+                "UnityEngine.Networking.NetworkLobbyManager",
+                "UnityEngine.Networking.NetworkLobbyPlayer",
+                "UnityEngine.Networking.NetworkManagerHUD",
+                "NetworkClient.GetRTT()"
             };
 
         public static readonly string[] knownCompatibleReplacements = {
@@ -35,11 +49,26 @@ namespace Mirror.MigrationUtilities {
                 "uint",
                 "syncInterval",
                 "NetworkServer.connections.Values",
-                "NetworkClient"
+                "NetworkServer.connections.Values",
+                "NetworkClient",
+                "Mirror.NetworkAnimator",
+                "Mirror.NetworkIdentity",
+                "Mirror.NetworkManager",
+                "Mirror.NetworkProximityChecker",
+                "Mirror.NetworkStartPosition",
+                "Mirror.NetworkTransform",
+                "Mirror.NetworkTransformChild",
+                "Mirror.NetworkLobbyManager",
+                "Mirror.NetworkLobbyPlayer",
+                "Mirror.NetworkManagerHUD",
+                "((int)(NetworkTime.rtt*1000d))"
             };
 
         public static readonly string[] notUnetTypes = {
                 "CertificateHandler",
+                "ChannelQOS",
+                "ConnectionConfig",
+                "ConnectionSimulatorConfig",
                 "DownloadHandler",
                 "DownloadHandlerAssetBundle",
                 "DownloadHandlerAudioClip",
@@ -48,8 +77,11 @@ namespace Mirror.MigrationUtilities {
                 "DownloadHandlerMovieTexture",
                 "DownloadHandlerScript",
                 "DownloadHandlerTexture",
+                "GlobalConfig",
+                "HostTopology",
                 "MultipartFormDataSection",
                 "MultipartFormFileSection",
+                "NetworkTransport",
                 "UnityWebRequest",
                 "UnityWebRequestAssetBundle",
                 "UnityWebRequestAsyncOperation",
@@ -57,7 +89,8 @@ namespace Mirror.MigrationUtilities {
                 "UnityWebRequestTexture",
                 "UploadHandler",
                 "UploadHandlerFile",
-                "UploadHandlerRaw"
+                "UploadHandlerRaw",
+                "Utility"
             };
 
         static int filesModified = 0;
@@ -96,18 +129,15 @@ namespace Mirror.MigrationUtilities {
                 }
 
                 // Final chance to abort.
-                if (!EditorUtility.DisplayDialog("Continue?", string.Format("We've found {0} file(s) that may need updating. Depending on your hardware and storage, " +
-                    "this might take a while. Do you wish to continue the process?", filesToScanAndModify.Count), "Go ahead!", "Abort")) {
+                if (!EditorUtility.DisplayDialog("Continue?", $"We've found {filesToScanAndModify.Count} file(s) that may need updating. Depending on your hardware and storage, " + "this might take a while. Do you wish to continue the process?", "Go ahead!", "Abort")) {
                     EditorUtility.DisplayDialog("Aborted", "You opted to abort the migration process. Please come back once you're ready to migrate.", "Got it");
                     return;
                 }
 
-                bool backupFiles = false;
-                if (EditorUtility.DisplayDialog("Scripts Backup", "Do you want to backup each script which are going to be converted?\n" +
-                "If so, each script will be saved as .bak file. You can delete it later if needed.",
-                "Yes", "No")) {
-                    backupFiles = true;
-                }
+                bool backupFiles = EditorUtility.DisplayDialog("Scripts Backup", 
+                    "Do you want to backup each script which are going to be converted?\n" +
+                    "If so, each script will be saved as .bak file. You can delete it later if needed.",
+                    "Yes", "No");
 
                 // Okay, let's do this!
                 ProcessFiles(filesToScanAndModify, backupFiles);
@@ -133,10 +163,14 @@ namespace Mirror.MigrationUtilities {
 
             foreach (string file in filesToProcess) {
                 try {
+                    FileFormatting ff = LoadEditorConfig(file);
+                    Encoding localencoding = ff.Encoding;
                     // Open and load it into the script buffer.
-                    using (sr = new StreamReader(file)) {
+                    using (sr = new StreamReader(file, Utils.GetEncoding(file, localencoding))) {
                         scriptBuffer = sr.ReadToEnd();
                     }
+
+                    if (scriptBuffer.Contains("//MirrorConverter NoConversion") || scriptBuffer.Contains("namespace Mirror")) continue;
 
                     // store initial buffer to use in final comparison before writing out file
                     var initialBuffer = scriptBuffer;
@@ -145,12 +179,12 @@ namespace Mirror.MigrationUtilities {
                         foreach (string type in notUnetTypes) { 
                             if (scriptBuffer.Contains(type) && !scriptBuffer.Contains("using " + type)) {
                                 int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
-                                scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + System.Environment.NewLine);
+                                scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + ff.LineEnding);
                             }
                         }
                     }
 
-                    scriptBuffer = scriptBuffer.Replace("using UnityEngine.Networking;", "using Mirror;");
+                    scriptBuffer = scriptBuffer.Replace("using UnityEngine.Networking;", scriptBuffer.Contains("using Mirror;") ? "" : "using Mirror;");
 
                     // since [] characters are used by Regex, need to replace it by ourself
                     scriptBuffer = scriptBuffer.Replace("NetworkClient.allClients[0]", "NetworkClient");
@@ -195,7 +229,7 @@ namespace Mirror.MigrationUtilities {
                                     // Replace it.
                                     if (netSettingArguments[0].Contains("channel")) {
                                         // Don't touch this.
-                                        scriptBuffer = scriptBuffer.Replace(string.Format("[{0}]", matches[i].Value), string.Empty);
+                                        scriptBuffer = scriptBuffer.Replace($"[{matches[i].Value}]", string.Empty);
                                     }
                                     // DONE!
                                 }
@@ -219,7 +253,7 @@ namespace Mirror.MigrationUtilities {
 
                     // Now the job is done, we want to write the data out to disk ONLY if the contents were actually changed... 
                     if (initialBuffer != scriptBuffer) {
-                        using (sw = new StreamWriter(file, false, new UTF8Encoding(false))) {
+                        using (sw = new StreamWriter(file, false, localencoding)) {
                             sw.Write(scriptBuffer.TrimStart());
                         }
                     }
@@ -228,9 +262,91 @@ namespace Mirror.MigrationUtilities {
                     filesModified++;
                 } catch (System.Exception e) {
                     // Kaboom, this tool ate something it shouldn't have.
-                    Debug.LogError(string.Format("[Mirror Migration Tool] Encountered an exception processing {0}:\n{1}", file, e.ToString()));
+                    Debug.LogError($"[Mirror Migration Tool] Encountered an exception processing {file}:\n{e.ToString()}");
                 }
             }
+        }
+
+        static FileFormatting LoadEditorConfig(string filepath) {
+            if (File.Exists(".editorconfig")) {
+                EditorConfigParser parser = new EditorConfigParser();
+                FileConfiguration[] configurations = parser.Parse(filepath).ToArray();
+                FileConfiguration currentConfiguration = null;
+                Encoding encoding = null;
+                string intend = null;
+                string lineEnding = null;
+                switch (configurations.Length) {
+                    case 0:
+                        return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding));
+                    case 1:
+                        currentConfiguration = configurations[0];
+                        break;
+                    default:
+                        currentConfiguration = configurations[configurations.Length - 1];
+                        break;
+                }
+                switch (currentConfiguration.Charset) {
+                    case null:
+                        encoding = Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding);
+                        break;
+                    case Charset.Latin1:
+                        encoding = Utils.Latin1Encoding;
+                        break;
+                    case Charset.UTF8:
+                        encoding = Utils.Utf8NoBomEncoding;
+                        break;
+                    case Charset.UTF16BE:
+                        encoding = Utils.Utf16BeBomEncoding;
+                        break;
+                    case Charset.UTF16LE:
+                        encoding = Utils.Utf16LeBomEncoding;
+                        break;
+                    case Charset.UTF8BOM:
+                        encoding = Utils.Utf8BomEncoding;
+                        break;
+                }
+
+                switch (currentConfiguration.EndOfLine) {
+                    case null:
+                        lineEnding = Environment.NewLine;
+                        break;
+                    case EndOfLine.LF:
+                        lineEnding = "\n";
+                        break;
+                    case EndOfLine.CRLF:
+                        lineEnding = "\r\n";
+                        break;
+                    case EndOfLine.CR:
+                        lineEnding = "\r";
+                        break;
+                }
+
+                switch (currentConfiguration.IndentStyle) {
+                    case null:
+                        intend = "    ";
+                        break;
+                    case IndentStyle.Tab:
+                        intend = "	";
+                        break;
+                    case IndentStyle.Space:
+                        int? count = currentConfiguration.IndentSize.NumberOfColumns;
+                        if (count != null) {
+                            int spacecount = count.Value;
+                            StringBuilder sb = new StringBuilder(spacecount, spacecount);
+                            for (int i = 0; i < spacecount; i++) {
+                                sb.Append(' ');
+                            }
+
+                            intend = sb.ToString();
+                        }
+                        else
+                            intend = "    ";
+                        break;
+                }
+                return new FileFormatting(lineEnding, intend, encoding);
+            }
+
+            return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding));
         }
 
         /// <summary>
@@ -240,6 +356,18 @@ namespace Mirror.MigrationUtilities {
             scriptBuffer = string.Empty;
             matches = null;
             filesModified = 0;
+        }
+    }
+
+    readonly struct FileFormatting {
+        public readonly string LineEnding;
+        public readonly string Intendation;
+        public readonly Encoding Encoding;
+
+        public FileFormatting(string lineEnding, string intendation, Encoding encoding) {
+            LineEnding = lineEnding;
+            Intendation = intendation;
+            Encoding = encoding;
         }
     }
 }
