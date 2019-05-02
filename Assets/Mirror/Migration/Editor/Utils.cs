@@ -7,13 +7,14 @@ using UnityEngine;
 
 namespace Mirror.MigrationUtilities {
     public class Utils : MonoBehaviour {
-        static readonly UTF8Encoding Utf8NoBomEncoding = new UTF8Encoding(false);
-        static readonly UTF8Encoding Utf8BomEncoding = new UTF8Encoding(true);
-        static readonly UTF7Encoding Utf7BomEncoding = new UTF7Encoding();
-        static readonly UnicodeEncoding Utf16LeBomEncoding = new UnicodeEncoding(false, true);
-        static readonly UnicodeEncoding Utf16BeBomEncoding = new UnicodeEncoding(true, true);
-        static readonly UTF32Encoding Utf32LeBomEncoding = new UTF32Encoding(false, true);
-        static readonly UTF32Encoding Utf32BeBomEncoding = new UTF32Encoding(true, true);
+        public static readonly UTF8Encoding Utf8NoBomEncoding = new UTF8Encoding(false);
+        public static readonly UTF8Encoding Utf8BomEncoding = new UTF8Encoding(true);
+        public static readonly UTF7Encoding Utf7BomEncoding = new UTF7Encoding();
+        public static readonly UnicodeEncoding Utf16LeBomEncoding = new UnicodeEncoding(false, true);
+        public static readonly UnicodeEncoding Utf16BeBomEncoding = new UnicodeEncoding(true, true);
+        public static readonly UTF32Encoding Utf32LeBomEncoding = new UTF32Encoding(false, true);
+        public static readonly UTF32Encoding Utf32BeBomEncoding = new UTF32Encoding(true, true);
+        public static readonly Encoding Latin1Encoding = Encoding.GetEncoding("ISO-8859-1");
 
         public static bool ReplaceNetworkComponent<TSource, TDestination>(GameObject prefab)
             where TSource : Component

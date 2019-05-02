@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using EditorConfig.Core;
 using UnityEditor;
 using UnityEngine;
 
@@ -100,7 +102,7 @@ namespace Mirror.MigrationUtilities {
         public static void ScriptsMigration() {
             // Safeguard in case a developer goofs up
             if (knownIncompatibleRegexes.Length != knownCompatibleReplacements.Length) {
-                Debug.LogError("[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.\nPlease re-download the converter.");
+                Debug.LogError($"[Mirror Migration Tool] BUG DETECTED: Regexes to search for DO NOT match the Regex Replacements. Cannot continue.\nPlease re-download the converter.");
                 return;
             }
 
@@ -160,11 +162,11 @@ namespace Mirror.MigrationUtilities {
             StreamWriter sw;
 
             foreach (string file in filesToProcess) {
-                try
-                {
-                    Encoding encoding = Utils.GetEncoding(file);
+                try {
+                    FileFormatting ff = LoadEditorConfig(file);
+                    Encoding localencoding = ff.Encoding;
                     // Open and load it into the script buffer.
-                    using (sr = new StreamReader(file, encoding)) {
+                    using (sr = new StreamReader(file, localencoding)) {
                         scriptBuffer = sr.ReadToEnd();
                     }
 
@@ -177,7 +179,7 @@ namespace Mirror.MigrationUtilities {
                         foreach (string type in notUnetTypes) { 
                             if (scriptBuffer.Contains(type) && !scriptBuffer.Contains("using " + type)) {
                                 int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
-                                scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + System.Environment.NewLine);
+                                scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + ff.LineEnding);
                             }
                         }
                     }
@@ -251,7 +253,7 @@ namespace Mirror.MigrationUtilities {
 
                     // Now the job is done, we want to write the data out to disk ONLY if the contents were actually changed... 
                     if (initialBuffer != scriptBuffer) {
-                        using (sw = new StreamWriter(file, false, encoding)) {
+                        using (sw = new StreamWriter(file, false, localencoding)) {
                             sw.Write(scriptBuffer.TrimStart());
                         }
                     }
@@ -265,6 +267,88 @@ namespace Mirror.MigrationUtilities {
             }
         }
 
+        static FileFormatting LoadEditorConfig(string filepath) {
+            if (File.Exists(".editorconfig")) {
+                EditorConfigParser parser = new EditorConfigParser();
+                FileConfiguration[] configurations = parser.Parse(filepath).ToArray();
+                FileConfiguration currentConfiguration = null;
+                Encoding encoding = null;
+                string intend = null;
+                string lineEnding = null;
+                switch (configurations.Length) {
+                    case 0:
+                        return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath));
+                    case 1:
+                        currentConfiguration = configurations[0];
+                        break;
+                    default:
+                        currentConfiguration = configurations[configurations.Length - 1];
+                        break;
+                }
+                switch (currentConfiguration.Charset) {
+                    case null:
+                        encoding = Utils.GetEncoding(filepath);
+                        break;
+                    case Charset.Latin1:
+                        encoding = Utils.Latin1Encoding;
+                        break;
+                    case Charset.UTF8:
+                        encoding = Utils.Utf8NoBomEncoding;
+                        break;
+                    case Charset.UTF16BE:
+                        encoding = Utils.Utf16BeBomEncoding;
+                        break;
+                    case Charset.UTF16LE:
+                        encoding = Utils.Utf16LeBomEncoding;
+                        break;
+                    case Charset.UTF8BOM:
+                        encoding = Utils.Utf8BomEncoding;
+                        break;
+                }
+
+                switch (currentConfiguration.EndOfLine) {
+                    case null:
+                        lineEnding = Environment.NewLine;
+                        break;
+                    case EndOfLine.LF:
+                        lineEnding = "\n";
+                        break;
+                    case EndOfLine.CRLF:
+                        lineEnding = "\r\n";
+                        break;
+                    case EndOfLine.CR:
+                        lineEnding = "\r";
+                        break;
+                }
+
+                switch (currentConfiguration.IndentStyle) {
+                    case null:
+                        intend = "    ";
+                        break;
+                    case IndentStyle.Tab:
+                        intend = "	";
+                        break;
+                    case IndentStyle.Space:
+                        int? count = currentConfiguration.IndentSize.NumberOfColumns;
+                        if (count != null) {
+                            int spacecount = count.Value;
+                            StringBuilder sb = new StringBuilder(spacecount, spacecount);
+                            for (int i = 0; i < spacecount; i++) {
+                                sb.Append(' ');
+                            }
+
+                            intend = sb.ToString();
+                        }
+                        else
+                            intend = "    ";
+                        break;
+                }
+                return new FileFormatting(lineEnding, intend, encoding);
+            }
+
+            return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath));
+        }
+
         /// <summary>
         /// Cleans up after the migration tool is completed or has failed.
         /// </summary>
@@ -272,6 +356,18 @@ namespace Mirror.MigrationUtilities {
             scriptBuffer = string.Empty;
             matches = null;
             filesModified = 0;
+        }
+    }
+
+    readonly struct FileFormatting {
+        public readonly string LineEnding;
+        public readonly string Intendation;
+        public readonly Encoding Encoding;
+
+        public FileFormatting(string lineEnding, string intendation, Encoding encoding) {
+            LineEnding = lineEnding;
+            Intendation = intendation;
+            Encoding = encoding;
         }
     }
 }
