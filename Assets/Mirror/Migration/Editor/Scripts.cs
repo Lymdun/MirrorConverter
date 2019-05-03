@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Mirror.MigrationUtilities {
     public class Scripts : MonoBehaviour {
 
         // private variables that don't need to be modified.
-        static readonly string scriptExtension = "*.cs";
+        const string ScriptExtension = "*.cs";
 
         public static readonly string[] knownIncompatibleRegexes = {
                 "SyncListStruct",
@@ -118,7 +118,7 @@ namespace Mirror.MigrationUtilities {
             // Now we scan the directory...
             try {
                 DirectoryInfo dirInfo = new DirectoryInfo(assetsFolder);
-                IEnumerable<FileInfo> potentialFiles = dirInfo.GetFiles(scriptExtension, SearchOption.AllDirectories).Where(x => !x.DirectoryName.Contains(@"\Mirror\"));
+                IEnumerable<FileInfo> potentialFiles = dirInfo.GetFiles(ScriptExtension, SearchOption.AllDirectories).Where(x => !x.DirectoryName.Contains(@"\Mirror\"));
 
                 // For every entry in this structure add it to the list.
                 // SearchOption.AllDirectories will traverse the directory stack
@@ -147,13 +147,10 @@ namespace Mirror.MigrationUtilities {
                 EditorUtility.DisplayDialog("Migration complete.", "Congratulations, you should now be Mirror Network ready.\n\n" +
                     "Thank you for using Mirror and Telepathy Networking Stack for Unity!\n\nPlease don't forget to drop by the GitHub " +
                     "repository to keep up to date and the Discord server if you have any problems. Have fun!", "Awesome");
-                return;
-
             } catch (System.Exception ex) {
                 EditorUtility.DisplayDialog("Oh no!", "An exception occurred. If you think this is a Mirror Networking bug, please file a bug report on the GitHub repository." +
                     "It could also be a logic bug in the Migration Tool itself. I encountered the following exception:\n\n" + ex.ToString(), "Okay");
                 Cleanup();
-                return;
             }
         }
 
@@ -173,12 +170,12 @@ namespace Mirror.MigrationUtilities {
                     if (scriptBuffer.Contains("//MirrorConverter NoConversion") || scriptBuffer.Contains("namespace Mirror")) continue;
 
                     // store initial buffer to use in final comparison before writing out file
-                    var initialBuffer = scriptBuffer;
+                    string initialBuffer = scriptBuffer;
                     
                     if (scriptBuffer.Contains("using UnityEngine.Networking;")) {
                         foreach (string type in notUnetTypes) { 
                             if (scriptBuffer.Contains(type) && !scriptBuffer.Contains("using " + type)) {
-                                int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;");
+                                int correctIndex = scriptBuffer.IndexOf("using UnityEngine.Networking;", StringComparison.Ordinal);
                                 scriptBuffer = scriptBuffer.Insert(correctIndex, "using " +  type + " = UnityEngine.Networking." + type + ";" + ff.LineEnding);
                             }
                         }
@@ -277,7 +274,7 @@ namespace Mirror.MigrationUtilities {
                 string lineEnding = null;
                 switch (configurations.Length) {
                     case 0:
-                        return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding));
+                        return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath));
                     case 1:
                         currentConfiguration = configurations[0];
                         break;
@@ -287,7 +284,7 @@ namespace Mirror.MigrationUtilities {
                 }
                 switch (currentConfiguration.Charset) {
                     case null:
-                        encoding = Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding);
+                        encoding = Utils.GetEncoding(filepath);
                         break;
                     case Charset.Latin1:
                         encoding = Utils.Latin1Encoding;
@@ -346,7 +343,7 @@ namespace Mirror.MigrationUtilities {
                 return new FileFormatting(lineEnding, intend, encoding);
             }
 
-            return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath, Utils.Utf8NoBomEncoding));
+            return new FileFormatting(Environment.NewLine, "    ", Utils.GetEncoding(filepath));
         }
 
         /// <summary>

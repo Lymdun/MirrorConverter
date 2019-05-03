@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -23,7 +23,10 @@ namespace Mirror.MigrationUtilities {
             TSource unetNetworkComponent = prefab.GetComponent<TSource>();
             if (unetNetworkComponent != null) {
                 //ignore deriving classes (they should be changed by the script conversion)
-                if (unetNetworkComponent.GetType() != typeof(TSource)) return false;
+                if (unetNetworkComponent.GetType() != typeof(TSource)) {
+                    Debug.Log("Ignoring deriving component on: " + prefab.name);
+                    return false;
+                }
 
                 // check for mirror component
                 TDestination mirrorNetworkComponent = prefab.AddComponent<TDestination>();
@@ -114,6 +117,10 @@ namespace Mirror.MigrationUtilities {
                 // Passed all tests, lets set the value
                 targetProperty.SetValue(destination, srcProp.GetValue(source, null), null);
             }
+        }
+
+        public static Encoding GetEncoding(string filename) {
+            return GetEncoding(filename, Utf8NoBomEncoding);
         }
 
         public static Encoding GetEncoding(string filename, Encoding defaultEncoding) {
