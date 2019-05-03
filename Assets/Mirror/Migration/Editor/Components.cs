@@ -52,8 +52,8 @@ namespace Mirror.MigrationUtilities {
 
                     GameObject prefab;
                     try {
-                        prefab = AssetDatabase.LoadAssetAtPath(relativepath, typeof(GameObject)) as GameObject;
-                    } catch (System.Exception) {
+                        prefab = AssetDatabase.LoadAssetAtPath<GameObject>(relativepath);
+                    } catch {
                         continue;
                     }
 
@@ -114,9 +114,10 @@ namespace Mirror.MigrationUtilities {
 
             // safest way to get all gameObjects on the scene instead of FindObjectOfType()
             GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
-            IEnumerable<GameObject> allObjetsInScene = allObjects.Where(x => x.scene == SceneManager.GetActiveScene());
+            Scene activeScene = SceneManager.GetActiveScene();
+            GameObject[] allObjetsInScene = allObjects.Where(x => x.scene == activeScene).ToArray();
 
-            int gameObjectCount = allObjetsInScene.Count();
+            int gameObjectCount = allObjetsInScene.Length;
 
             foreach (GameObject currentGameObject in allObjetsInScene) {
                 if (currentGameObject.hideFlags == HideFlags.NotEditable || currentGameObject.hideFlags == HideFlags.HideAndDontSave)
