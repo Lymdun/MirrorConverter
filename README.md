@@ -7,8 +7,11 @@ Based on Mirror [migration guide](https://vis2k.github.io/Mirror/General/Migrati
 - Rename SyncListStruct to SyncListSTRUCT
 - Replace NetworkHash128 and NetworkInstanceId
 - Replace Components
+- Replace Usings
 
 Others steps are needed to be done by you.
+
+_In case you want to exclude a script from the Script Converter, just add **//MirrorConverter NoConversion** on top of your script._
 
 ## Installation
 
