@@ -4,7 +4,7 @@ This is a tool which automatically convert your UNET project to Mirror project, 
 Based on Mirror [migration guide](https://vis2k.github.io/Mirror/General/Migration), this tool is able to do alone the following steps: 
 - Replace namespace
 - Remove NetworkSettings
-- Rename SyncListStruct to SyncListSTRUCT
+- Rename SyncListStruct to SyncList
 - Replace NetworkHash128 and NetworkInstanceId
 - Replace Components
 - Replace Usings
