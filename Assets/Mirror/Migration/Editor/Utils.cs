@@ -68,7 +68,6 @@ namespace Mirror.MigrationUtilities {
                     return false;
                 }
 
-                mirrorNetworkComponent.localPlayerAuthority = unetNetworkComponent.localPlayerAuthority;
                 mirrorNetworkComponent.serverOnly = unetNetworkComponent.serverOnly;
 
                 // destroy UNET component
