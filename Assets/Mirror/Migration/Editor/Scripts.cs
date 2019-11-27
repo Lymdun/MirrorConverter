@@ -158,7 +158,7 @@ namespace Mirror.MigrationUtilities {
             }
         }
 
-        private static void ProcessFiles(List<string> filesToProcess, bool backupFiles) {
+        private static void ProcessFiles(IEnumerable<string> filesToProcess, bool backupFiles) {
             StreamReader sr;
             StreamWriter sw;
 
