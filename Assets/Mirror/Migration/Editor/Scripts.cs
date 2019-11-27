@@ -40,7 +40,8 @@ namespace Mirror.MigrationUtilities {
                 "UnityEngine.Networking.NetworkLobbyManager",
                 "UnityEngine.Networking.NetworkLobbyPlayer",
                 "UnityEngine.Networking.NetworkManagerHUD",
-                "NetworkClient.GetRTT()"
+                "NetworkClient.GetRTT()",
+                "NetworkConnection.playerController"
             };
 
         public static readonly string[] knownCompatibleReplacements = {
@@ -69,7 +70,8 @@ namespace Mirror.MigrationUtilities {
                 "Mirror.NetworkLobbyManager",
                 "Mirror.NetworkLobbyPlayer",
                 "Mirror.NetworkManagerHUD",
-                "((int)(NetworkTime.rtt*1000d))"
+                "((int)(NetworkTime.rtt*1000d))",
+                "NetworkConnection.identity"
             };
 
         public static readonly string[] notUnetTypes = {
