@@ -48,7 +48,8 @@ namespace Mirror.MigrationUtilities {
                     int numChangesOnFile = 0;
                     string relativepath = "Assets" + file.Substring(Application.dataPath.Length);
 
-                    EditorUtility.DisplayProgressBar("Mirror Migration Progress", $"{fileCounter} of {gameObjectCount} files scanned...", fileCounter / gameObjectCount);
+                    int objectCount = fileCounter / gameObjectCount;
+                    EditorUtility.DisplayProgressBar("Mirror Migration Progress", $"{fileCounter} of {gameObjectCount} files scanned...", objectCount);
 
                     GameObject prefab;
                     try {
@@ -124,7 +125,8 @@ namespace Mirror.MigrationUtilities {
                     continue;
 
                 convertedGoCounter++;
-                EditorUtility.DisplayProgressBar("Mirror Migration Progress", $"{convertedGoCounter} of {gameObjectCount} game object scanned...", convertedGoCounter / gameObjectCount);
+                int objectCount = convertedGoCounter / gameObjectCount;
+                EditorUtility.DisplayProgressBar("Mirror Migration Progress", $"{convertedGoCounter} of {gameObjectCount} game object scanned...", objectCount);
 
                 IEnumerable<Transform> childsAndParent = currentGameObject.GetComponentsInChildren<Transform>(true);
 
