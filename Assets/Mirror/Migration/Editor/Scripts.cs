@@ -360,7 +360,7 @@ namespace Mirror.MigrationUtilities {
         }
     }
 
-    readonly struct FileFormatting {
+    internal readonly struct FileFormatting {
         public readonly string LineEnding;
         public readonly string Intendation;
         public readonly Encoding Encoding;
