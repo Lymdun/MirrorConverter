@@ -55,13 +55,7 @@ crashlytics-build.properties
 [Aa]ssets/Scenes.meta
 
 # Dependencies
-[Aa]ssets/Mirror/Components
-[Aa]ssets/Mirror/Editor
-[Aa]ssets/Mirror/Examples
-[Aa]ssets/Mirror/Plugins
-[Aa]ssets/Mirror/Runtime
-[Aa]ssets/Mirror/Tests
-[Aa]ssets/Mirror/Transports
+[Aa]ssets/Mirror/
 [Aa]ssets/Mirror/*.txt
 [Aa]ssets/Mirror/*.meta
 ![Aa]ssets/Mirror/Migration
