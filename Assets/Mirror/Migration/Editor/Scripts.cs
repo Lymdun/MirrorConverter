@@ -130,11 +130,7 @@ namespace Mirror.MigrationUtilities {
 
                 // For every entry in this structure add it to the list.
                 // SearchOption.AllDirectories will traverse the directory stack
-                foreach (FileInfo potentialFile in potentialFiles) {
-                    // DEBUG ONLY. This will cause massive Unity Console Spammage!
-                    // Debug.Log("[Mirror Migration Tool] DEBUG: Scanned " + potentialFile.FullName);
-                    filesToScanAndModify.Add(potentialFile.FullName);
-                }
+                filesToScanAndModify.AddRange(potentialFiles.Select(potentialFile => potentialFile.FullName));
 
                 // Final chance to abort.
                 if (!EditorUtility.DisplayDialog("Continue?", $"We've found {filesToScanAndModify.Count} file(s) that may need updating. Depending on your hardware and storage, " + "this might take a while. Do you wish to continue the process?", "Go ahead!", "Abort")) {
