@@ -67,8 +67,8 @@ namespace Mirror.MigrationUtilities {
                 "Mirror.NetworkStartPosition",
                 "Mirror.NetworkTransform",
                 "Mirror.NetworkTransformChild",
-                "Mirror.NetworkLobbyManager",
-                "Mirror.NetworkLobbyPlayer",
+                "Mirror.NetworkRoomManager",
+                "Mirror.NetworkRoomPlayer",
                 "Mirror.NetworkManagerHUD",
                 "((int)(NetworkTime.rtt*1000d))",
                 "NetworkConnection.identity"
