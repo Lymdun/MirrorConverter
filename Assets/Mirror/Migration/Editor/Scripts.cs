@@ -25,8 +25,10 @@ namespace Mirror.MigrationUtilities {
                 "GetNetworkSendInterval()",
                 "NetworkServer.connections",
                 "NetworkServer.connections.Values.Values",
+                "NetworkServer.SpawnWithClientAuthority",
                 "NetworkManager.singleton.client",
                 "NetworkManager.singleton.IsHeadless()",
+                "override void OnClientChangeScene(string newSceneName)",
                 "UnityEngine.Networking.NetworkAnimator",
                 "UnityEngine.Networking.NetworkBehaviour",
                 "UnityEngine.Networking.NetworkClient",
@@ -42,6 +44,7 @@ namespace Mirror.MigrationUtilities {
                 "UnityEngine.Networking.NetworkLobbyPlayer",
                 "UnityEngine.Networking.NetworkManagerHUD",
                 "NetworkClient.GetRTT()",
+                "NetworkClient.ShutdownAll()",
                 "NetworkConnection.playerController"
             };
 
@@ -56,8 +59,10 @@ namespace Mirror.MigrationUtilities {
                 "syncInterval",
                 "NetworkServer.connections.Values",
                 "NetworkServer.connections.Values",
+                "NetworkServer.Spawn",
                 "NetworkClient",
                 "NetworkManager.singleton.isHeadless",
+                "override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)",
                 "Mirror.NetworkAnimator",
                 "Mirror.NetworkBehaviour",
                 "Mirror.NetworkClient",
@@ -73,6 +78,7 @@ namespace Mirror.MigrationUtilities {
                 "Mirror.NetworkRoomPlayer",
                 "Mirror.NetworkManagerHUD",
                 "((int)(NetworkTime.rtt*1000d))",
+                "NetworkClient.Shutdown()",
                 "NetworkConnection.identity"
             };
 
