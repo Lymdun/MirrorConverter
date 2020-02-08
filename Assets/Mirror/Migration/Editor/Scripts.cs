@@ -41,6 +41,7 @@ namespace Mirror.MigrationUtilities {
                 "UnityEngine.Networking.NetworkLobbyPlayer",
                 "UnityEngine.Networking.NetworkManagerHUD",
                 "NetworkClient.GetRTT()",
+                "NetworkClient.ShutdownAll()",
                 "NetworkConnection.playerController"
             };
 
@@ -71,6 +72,7 @@ namespace Mirror.MigrationUtilities {
                 "Mirror.NetworkRoomPlayer",
                 "Mirror.NetworkManagerHUD",
                 "((int)(NetworkTime.rtt*1000d))",
+                "NetworkClient.Shutdown()",
                 "NetworkConnection.identity"
             };
 
