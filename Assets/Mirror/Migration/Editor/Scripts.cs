@@ -30,6 +30,8 @@ namespace Mirror.MigrationUtilities {
                 "NetworkManager.singleton.IsHeadless()",
                 "NetworkManager.singleton.IsClientConnected()",
                 "override void OnClientChangeScene(string newSceneName)",
+                "override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation)",
+                "override void OnSetLocalVisibility(bool visible)",
                 "UnityEngine.Networking.NetworkAnimator",
                 "UnityEngine.Networking.NetworkBehaviour",
                 "UnityEngine.Networking.NetworkClient",
@@ -46,6 +48,8 @@ namespace Mirror.MigrationUtilities {
                 "UnityEngine.Networking.NetworkManagerHUD",
                 "NetworkClient.GetRTT()",
                 "NetworkClient.ShutdownAll()",
+                "NetworkClient.allClients",
+                "NetworkClient.singleton",
                 "NetworkConnection.playerController"
             };
 
@@ -65,6 +69,8 @@ namespace Mirror.MigrationUtilities {
                 "NetworkManager.singleton.isHeadless",
                 "NetworkClient.singleton.isConnected",
                 "override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)",
+                "override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)",
+                "override void OnSetHostVisibility(bool visible)",
                 "Mirror.NetworkAnimator",
                 "Mirror.NetworkBehaviour",
                 "Mirror.NetworkClient",
@@ -81,6 +87,8 @@ namespace Mirror.MigrationUtilities {
                 "Mirror.NetworkManagerHUD",
                 "((int)(NetworkTime.rtt*1000d))",
                 "NetworkClient.Shutdown()",
+                "NetworkClient",
+                "NetworkClient",
                 "NetworkConnection.identity"
             };
 
