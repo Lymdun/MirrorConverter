@@ -57,7 +57,7 @@ namespace Mirror.MigrationUtilities {
                 "NetworkServer.connections.Values",
                 "NetworkServer.connections.Values",
                 "NetworkClient",
-                "NetworkClient.isConnected",
+                "NetworkClient.singleton.isConnected",
                 "Mirror.NetworkAnimator",
                 "Mirror.NetworkBehaviour",
                 "Mirror.NetworkClient",
