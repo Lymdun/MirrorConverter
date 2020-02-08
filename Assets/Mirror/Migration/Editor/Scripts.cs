@@ -26,7 +26,7 @@ namespace Mirror.MigrationUtilities {
                 "NetworkServer.connections",
                 "NetworkServer.connections.Values.Values",
                 "NetworkManager.singleton.client",
-                "NetworkManager.IsClientConnected()",
+                "NetworkManager.singleton.IsClientConnected()",
                 "UnityEngine.Networking.NetworkAnimator",
                 "UnityEngine.Networking.NetworkBehaviour",
                 "UnityEngine.Networking.NetworkClient",
